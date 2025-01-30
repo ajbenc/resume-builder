@@ -3,15 +3,16 @@ import react from "@vitejs/plugin-react-swc";
 
 export default defineConfig({
   plugins: [react()],
+  base: "/resume-builder/", //  
   optimizeDeps: {
-    include: ["pdf-lib"], // ✅ Ensure pdf-lib is pre-bundled properly
+    include: ["pdf-lib"], //  
   },
   build: {
     rollupOptions: {
-      external: ["pdf-lib"], // ✅ Force pdf-lib to be treated as external
+      external: ["pdf-lib"], //  
     },
     commonjsOptions: {
-      transformMixedEsModules: true, // ✅ Allow mixed ESM and CJS modules
+      transformMixedEsModules: true, //  
     },
   },
 });
