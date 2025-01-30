@@ -1,3 +1,222 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* General Styling */
+body {
+  @apply bg-gradient-to-br from-gray-50 via-gray-100 to-gray-50 text-gray-800 font-sans transition duration-300 ease-in-out;
+}
+
+h1 {
+  @apply text-5xl font-extrabold mb-6 text-blue-700;
+}
+h2 {
+  @apply text-3xl font-semibold mb-4 text-gray-700;
+}
+h3 {
+  @apply text-2xl font-medium mb-4;
+}
+
+/* Form Styling */
+form {
+  @apply bg-white p-6 rounded-lg shadow-md transition-all duration-300 ease-in-out;
+}
+
+input,
+textarea {
+  @apply w-full p-3 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-300 focus:outline-none transition-all duration-300;
+}
+
+input:focus,
+textarea:focus {
+  @apply border-blue-500 shadow-lg;
+}
+
+/* Buttons */
+button {
+  @apply bg-blue-500 text-white font-semibold py-3 px-6 rounded-lg shadow-md transform transition-transform duration-300 ease-in-out;
+}
+
+button:hover {
+  @apply bg-blue-600 scale-105 shadow-lg;
+}
+
+button:active {
+  @apply scale-95 shadow-inner;
+}
+
+/* Advanced Button Animations (Uiverse.io) */
+.cta {
+  border: none;
+  background: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  letter-spacing: 1.5px;
+}
+
+.cta span {
+  padding-bottom: 7px;
+  letter-spacing: 4px;
+  font-size: 14px;
+  padding-right: 15px;
+  text-transform: uppercase;
+}
+
+.cta:hover svg {
+  transform: translateX(0);
+}
+
+.cta:active svg {
+  transform: scale(0.9);
+}
+
+.hover-underline-animation {
+  position: relative;
+  color: white;
+  padding-bottom: 4px;
+}
+
+.hover-underline-animation:after {
+  content: "";
+  position: absolute;
+  width: 100%;
+  transform: scaleX(0);
+  height: 2px;
+  bottom: 0;
+  left: 0;
+  background-color: white;
+  transform-origin: bottom right;
+  transition: transform 0.25s ease-out;
+}
+
+.cta:hover .hover-underline-animation:after {
+  transform: scaleX(1);
+  transform-origin: bottom left;
+}
+
+.hover-underline-animation:after {
+  content: "";
+  position: absolute;
+  width: 100%;
+  transform: scaleX(0);
+  height: 2px;
+  bottom: 0;
+  left: 0;
+  background-color: white;
+  transform-origin: bottom right;
+  transition: transform 0.25s ease-out;
+}
+
+.cta:hover .hover-underline-animation:after {
+  transform: scaleX(1);
+  transform-origin: bottom left;
+}
+
+
+.cta span {
+  @apply transition duration-300 ease-in-out;
+}
+
+.cta svg {
+  @apply transition-transform duration-300 ease-in-out;
+  transform: translateX(-8px);
+}
+
+.cta:hover svg {
+  transform: translateX(0);
+}
+
+.cta:active svg {
+  transform: scale(0.9);
+}
+
+.hover-underline-animation {
+  @apply relative;
+  color: black;
+  padding-bottom: 4px;
+}
+
+.hover-underline-animation:after {
+  content: "";
+  @apply absolute w-full h-[2px] left-0 bottom-0 bg-black;
+  transform: scaleX(0);
+  transform-origin: bottom right;
+  transition: transform 0.25s ease-out;
+}
+
+.cta:hover .hover-underline-animation:after {
+  transform: scaleX(1);
+  transform-origin: bottom left;
+}
+
+/* PDF Viewer */
+.pdf-viewer {
+  @apply bg-white p-8 rounded-lg shadow-lg border border-gray-200;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.8s ease-out;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  h1 {
+    @apply text-4xl;
+  }
+
+  h2 {
+    @apply text-2xl;
+  }
+
+  form {
+    @apply p-4;
+  }
+
+  button {
+    @apply w-full;
+  }
+
+  .pdf-viewer {
+    @apply mt-6 w-full;
+  }
+}
+
+@media (max-width: 480px) {
+  h1 {
+    @apply text-3xl;
+  }
+
+  h2 {
+    @apply text-xl;
+  }
+
+  form {
+    @apply p-2;
+  }
+
+  button {
+    @apply text-sm py-2 px-4;
+  }
+}
+
+textarea {
+  @apply resize-none break-words whitespace-pre-wrap;
+}
+
+.text-content {
+  @apply break-words whitespace-pre-wrap;
+}

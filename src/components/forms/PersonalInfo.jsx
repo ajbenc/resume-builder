@@ -1,7 +1,7 @@
 import { useContext } from "react";
-import { useFormik } from "formik";  
+import { useFormik } from "formik";
 import { ResumeContext } from "../../contexts/ResumeContext";
-import { personalInfoSchema } from "../../services/validation";  
+import { personalInfoSchema } from "../../services/validation";
 
 const PersonalInfo = () => {
   const { state, dispatch } = useContext(ResumeContext);
@@ -15,17 +15,69 @@ const PersonalInfo = () => {
     },
     validationSchema: personalInfoSchema,
     onSubmit: (values) => {
-      console.log("Submitting Personal Info:", values);
       dispatch({
         type: "UPDATE_PERSONAL_INFO",
         payload: values,
       });
-      console.log("Updated Personal Info State:", state.personalInfo);
     },
   });
 
+  // Handle profile picture upload and ensure it's in PNG format
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const img = new Image();
+        img.onload = () => {
+          // Convert image to PNG using a canvas
+          const canvas = document.createElement("canvas");
+          canvas.width = img.width;
+          canvas.height = img.height;
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(img, 0, 0);
+          const pngDataUrl = canvas.toDataURL("image/png"); // Convert to PNG
+          dispatch({
+            type: "UPDATE_PERSONAL_INFO",
+            payload: { profilePicture: pngDataUrl },
+          });
+        };
+        img.onerror = () => {
+          console.error("Invalid image format. Please upload a valid image.");
+          alert("Failed to process the image. Please upload a valid file.");
+        };
+        img.src = reader.result;
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   return (
-    <form onSubmit={formik.handleSubmit} className="space-y-4">
+    <form
+      onSubmit={formik.handleSubmit}
+      className="space-y-6 bg-white p-6 rounded-lg shadow-custom-light transition-all hover:shadow-custom-dark"
+    >
+      {/* Profile Picture Upload */}
+      <div>
+        <label className="block text-sm font-semibold mb-2">Profile Picture</label>
+        <input
+          type="file"
+          accept="image/*"
+          onChange={handleImageChange}
+          className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:font-semibold file:bg-blue-500 file:text-white hover:file:bg-blue-600 transition-all cursor-pointer"
+        />
+        {state.personalInfo.profilePicture && (
+          <div className="mt-4">
+            <img
+              src={state.personalInfo.profilePicture}
+              alt="Profile Preview"
+              className="w-32 h-32 rounded-full object-cover border-2 border-primary"
+            />
+          </div>
+        )}
+      </div>
+
+      {/* Name Field */}
       <div>
         <label className="block text-sm font-semibold">Name</label>
         <input
@@ -34,17 +86,18 @@ const PersonalInfo = () => {
           value={formik.values.name}
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}
-          className={`w-full p-2 border ${
+          className={`w-full p-3 border ${
             formik.touched.name && formik.errors.name
               ? "border-red-500"
               : "border-gray-300"
-          } rounded`}
+          } rounded-md shadow-sm focus:ring-2 focus:ring-primaryDark focus:outline-none`}
         />
         {formik.touched.name && formik.errors.name && (
-          <p className="text-red-500 text-sm">{formik.errors.name}</p>
+          <p className="text-red-500 text-sm mt-1">{formik.errors.name}</p>
         )}
       </div>
 
+      {/* Email Field */}
       <div>
         <label className="block text-sm font-semibold">Email</label>
         <input
@@ -53,17 +106,18 @@ const PersonalInfo = () => {
           value={formik.values.email}
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}
-          className={`w-full p-2 border ${
+          className={`w-full p-3 border ${
             formik.touched.email && formik.errors.email
               ? "border-red-500"
               : "border-gray-300"
-          } rounded`}
+          } rounded-md shadow-sm focus:ring-2 focus:ring-primaryDark focus:outline-none`}
         />
         {formik.touched.email && formik.errors.email && (
-          <p className="text-red-500 text-sm">{formik.errors.email}</p>
+          <p className="text-red-500 text-sm mt-1">{formik.errors.email}</p>
         )}
       </div>
 
+      {/* Phone Field */}
       <div>
         <label className="block text-sm font-semibold">Phone</label>
         <input
@@ -72,20 +126,21 @@ const PersonalInfo = () => {
           value={formik.values.phone}
           onChange={formik.handleChange}
           onBlur={formik.handleBlur}
-          className={`w-full p-2 border ${
+          className={`w-full p-3 border ${
             formik.touched.phone && formik.errors.phone
               ? "border-red-500"
               : "border-gray-300"
-          } rounded`}
+          } rounded-md shadow-sm focus:ring-2 focus:ring-primaryDark focus:outline-none`}
         />
         {formik.touched.phone && formik.errors.phone && (
-          <p className="text-red-500 text-sm">{formik.errors.phone}</p>
+          <p className="text-red-500 text-sm mt-1">{formik.errors.phone}</p>
         )}
       </div>
 
+      {/* Save Button */}
       <button
         type="submit"
-        className="bg-blue-500 text-white px-4 py-2 rounded mt-4"
+        className="bg-gradient-to-r from-primary to-primaryDark text-white py-3 px-6 rounded-lg shadow-lg hover:scale-105 hover:shadow-custom-dark transition-all"
       >
         Save Personal Info
       </button>

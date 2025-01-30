@@ -1,18 +1,15 @@
 import { createContext, useReducer, useEffect } from "react";
 import PropTypes from "prop-types";
-import {
-  saveToLocalStorage,
-  loadFromLocalStorage,
-} from "../services/localStorage"; // Import the localStorage functions
+import { saveToLocalStorage, loadFromLocalStorage } from "../services/localStorage"; // Import localStorage functions
 
 // Initial state structure
 const initialState = {
-  personalInfo: { name: "", email: "", phone: "", summary: "" },
+  personalInfo: { name: "", email: "", phone: "", summary: "", profilePicture: "" },
   education: [],
   experience: [],
   skills: [],
   projects: [],
-  sections: [], // To keep track of which sections to show dynamically
+  sections: [], // Dynamic sections for ordering
 };
 
 // Reducer function to handle state updates
@@ -24,21 +21,22 @@ const resumeReducer = (state, action) => {
         personalInfo: { ...state.personalInfo, ...action.payload },
       };
 
+    case "UPDATE_PROFILE_PICTURE":
+      return {
+        ...state,
+        personalInfo: { ...state.personalInfo, profilePicture: action.payload },
+      };
+
     case "ADD_SECTION":
       if (
         state.sections.some((section) => section.type === action.payload.type)
       ) {
-        console.warn(
-          `Section of type '${action.payload.type}' already exists.`
-        );
+        console.warn(`Section of type '${action.payload.type}' already exists.`);
         return state; // Prevent duplicates
       }
       return {
         ...state,
-        sections: [
-          ...state.sections,
-          { type: action.payload.type, title: action.payload.title, data: [] },
-        ],
+        sections: [...state.sections, action.payload],
       };
 
     case "REMOVE_SECTION":
@@ -49,16 +47,13 @@ const resumeReducer = (state, action) => {
         ),
       };
 
-    case "ADD_EXPERIENCE":
-      return { ...state, experience: [...state.experience, action.payload] };
-
-    case "DELETE_EXPERIENCE":
-      return {
-        ...state,
-        experience: state.experience.filter(
-          (_, index) => index !== action.payload
-        ),
-      };
+    case "REORDER_SECTIONS": {
+      const { sourceIndex, destinationIndex } = action.payload;
+      const updatedSections = Array.from(state.sections);
+      const [movedItem] = updatedSections.splice(sourceIndex, 1);
+      updatedSections.splice(destinationIndex, 0, movedItem);
+      return { ...state, sections: updatedSections };
+    }
 
     case "ADD_EDUCATION":
       return { ...state, education: [...state.education, action.payload] };
@@ -67,6 +62,20 @@ const resumeReducer = (state, action) => {
       return {
         ...state,
         education: state.education.filter(
+          (_, index) => index !== action.payload
+        ),
+      };
+
+      case "ADD_EXPERIENCE":
+        return {
+          ...state,
+          experience: [...state.experience, action.payload],
+        };
+
+    case "DELETE_EXPERIENCE":
+      return {
+        ...state,
+        experience: state.experience.filter(
           (_, index) => index !== action.payload
         ),
       };
@@ -92,12 +101,10 @@ const resumeReducer = (state, action) => {
       };
 
     case "RESET_RESUME":
-      console.log("Resetting resume to initial state.");
       return initialState;
 
-    default:
-      console.error(`Unknown action type: ${action.type}`);
-      return state;
+      default:
+        throw new Error(`Unknown action type: ${action.type}`);
   }
 };
 
@@ -112,15 +119,17 @@ export const ResumeProvider = ({ children }) => {
   useEffect(() => {
     const savedData = loadFromLocalStorage();
     if (savedData) {
-      dispatch({
-        type: "UPDATE_PERSONAL_INFO",
-        payload: savedData.personalInfo || {},
-      });
-      dispatch({
-        type: "ADD_SECTION",
-        payload: savedData.sections || [],
-      });
-      // Load other sections (education, experience, etc.)
+      if (savedData.personalInfo) {
+        dispatch({
+          type: "UPDATE_PERSONAL_INFO",
+          payload: savedData.personalInfo,
+        });
+      }
+      if (savedData.sections) {
+        savedData.sections.forEach((section) =>
+          dispatch({ type: "ADD_SECTION", payload: section })
+        );
+      }
       if (savedData.education) {
         savedData.education.forEach((edu) =>
           dispatch({ type: "ADD_EDUCATION", payload: edu })

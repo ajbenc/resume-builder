@@ -1,118 +1,183 @@
-// src/components/core/PDFViewer.jsx
 import { useContext } from "react";
+import DOMPurify from "dompurify";
 import { ResumeContext } from "../../contexts/ResumeContext";
 import Download from "./Download";
-const PDFViewer = () => {
+
+const PDFViewer = ({ selectedTemplate }) => {
   const { state } = useContext(ResumeContext);
   const {
-    personalInfo: { name, email, phone, summary },
+    personalInfo: { name, email, phone, summary, profilePicture },
     experience,
     education,
     projects,
     skills,
   } = state;
 
-  return (
-    <div className="bg-white p-6 rounded shadow-md" id="pdf-content">
+  const renderRichText = (htmlContent) => {
+    const sanitizedHTML = DOMPurify.sanitize(htmlContent || "");
+    return <div dangerouslySetInnerHTML={{ __html: sanitizedHTML }} />;
+  };
+
+  const renderModernTemplate = () => (
+    <div
+      className="bg-gradient-to-br from-white via-gray-50 to-gray-100 p-8 rounded-xl shadow-lg border border-gray-200"
+      id="pdf-content"
+    >
       {/* Header */}
-      <div className="border-b pb-4 mb-4">
-        <h1 className="text-2xl font-bold">{name || "Your Name"}</h1>
-        <p>{email || "your.email@example.com"}</p>
-        <p>{phone || "123-456-7890"}</p>
+      <div className="border-b border-gray-300 pb-6 mb-6 flex items-center">
+        {profilePicture && (
+          <img
+            src={profilePicture}
+            alt="Profile"
+            className="w-20 h-20 rounded-full object-cover mr-6 shadow-lg"
+          />
+        )}
+        <div>
+          <h1 className="text-3xl font-bold text-gray-800">
+            {name || "Your Name"}
+          </h1>
+          <p className="text-gray-600">{email || "your.email@example.com"}</p>
+          <p className="text-gray-600">{phone || "123-456-7890"}</p>
+        </div>
       </div>
+
       {/* Summary */}
       {summary && (
-        <div className="mb-4">
-          <h2 className="text-lg font-semibold">Profile Summary</h2>
-          <p className="whitespace-pre-wrap break-words">{summary}</p>
+        <div className="mb-6">
+          <h2 className="text-xl font-semibold text-primaryDark mb-2">
+            Profile Summary
+          </h2>
+          <div className="text-gray-700 whitespace-pre-wrap break-words">
+            {renderRichText(summary)}
+          </div>
         </div>
       )}
-      {/* Skills Section */}
+
+      {/* Skills */}
       {skills.length > 0 && (
-        <div className="mb-4">
-          <h2 className="text-lg font-semibold">Skills</h2>
-          <ul className="list-disc pl-5">
+        <div className="mb-6">
+          <h2 className="text-xl font-semibold text-primaryDark mb-2">
+            Skills
+          </h2>
+          <ul className="list-disc pl-6 text-gray-700">
             {skills.map((skill, index) => (
               <li key={index}>{skill}</li>
             ))}
           </ul>
         </div>
       )}
-      {/* Experience Section */}
+
+      {/* Experience */}
       {experience.length > 0 && (
-        <div className="mb-4">
-          <h2 className="text-lg font-semibold">Experience</h2>
+        <div className="mb-6">
+          <h2 className="text-xl font-semibold text-primaryDark mb-2">
+            Experience
+          </h2>
           {experience.map((exp, index) => (
-            <div key={index} className="border-b pb-2">
-              <h3 className="font-semibold">
+            <div
+              key={index}
+              className="mb-4 bg-white p-4 rounded-lg shadow border border-gray-200"
+            >
+              <h3 className="font-semibold text-gray-800">
                 {exp.role} at {exp.company}
               </h3>
-              <p className="text-gray-500 text-sm">
+              <p className="text-gray-500 text-sm mb-2">
                 {exp.startDate} - {exp.endDate || "Present"}
               </p>
-              <ul className="list-disc pl-5">
-                {exp.description.split("\n").map((line, i) => (
-                  <li key={i}>{line}</li>
-                ))}
-              </ul>
+              <div className="text-gray-700 break-words whitespace-pre-wrap">
+                {renderRichText(exp.description)}
+              </div>
             </div>
           ))}
         </div>
       )}
-      {/* Education Section */}
+
+      {/* Education */}
       {education.length > 0 && (
-        <div className="mb-4">
-          <h2 className="text-lg font-semibold">Education</h2>
+        <div className="mb-6">
+          <h2 className="text-xl font-semibold text-primaryDark mb-2">
+            Education
+          </h2>
           {education.map((edu, index) => (
-            <div key={index} className="border-b pb-2">
-              <h3 className="font-semibold">
+            <div
+              key={index}
+              className="mb-4 bg-white p-4 rounded-lg shadow border border-gray-200"
+            >
+              <h3 className="font-semibold text-gray-800">
                 {edu.degree} at {edu.school}
               </h3>
-              <p className="text-gray-500 text-sm">
+              <p className="text-gray-500 text-sm mb-2">
                 {edu.startDate} - {edu.endDate || "Present"}
               </p>
-              <ul className="list-disc pl-5">
-                {edu.description.split("\n").map((line, i) => (
-                  <li key={i}>{line}</li>
-                ))}
-              </ul>
+              <div className="text-gray-700 break-words whitespace-pre-wrap overflow-auto max-h-32">
+                {edu.description}
+              </div>
             </div>
           ))}
         </div>
       )}
-      {/* Projects Section */}
+
+      {/* Projects */}
       {projects.length > 0 && (
-        <div className="mb-4">
-          <h2 className="text-lg font-semibold">Projects</h2>
+        <div className="mb-6">
+          <h2 className="text-xl font-semibold text-primaryDark mb-2">
+            Projects
+          </h2>
           {projects.map((proj, index) => (
-            <div key={index} className="border-b pb-2">
-              <h3 className="font-semibold">{proj.name}</h3>
-              <ul className="list-disc pl-5">
-                {proj.description.split("\n").map((line, i) => (
-                  <li key={i}>{line}</li>
-                ))}
-              </ul>
-              <p>Technologies: {proj.technologies}</p>
+            <div
+              key={index}
+              className="mb-4 bg-white p-4 rounded-lg shadow border border-gray-200"
+            >
+              <h3 className="font-semibold text-gray-800">{proj.name}</h3>
+              <div className="text-gray-700 break-words whitespace-pre-wrap">
+                {proj.description}
+              </div>
+              <p className="text-gray-600 mt-2">
+                Technologies: {proj.technologies}
+              </p>
             </div>
           ))}
         </div>
       )}
+
       {/* Placeholder for Empty State */}
       {experience.length === 0 &&
         education.length === 0 &&
         projects.length === 0 && (
-          <div className="text-gray-500 text-center">
+          <div className="text-gray-500 text-center italic">
             Add sections to preview them here.
           </div>
         )}
+
       {/* Download Button */}
-      <Download /> {/* Include the Download component */}
-      {/* Footer */}
-      <footer className="mt-6 border-t pt-4 text-center text-gray-500">
-        <i>Preview of your resume</i>
-      </footer>
+      <div className="mt-6">
+        <Download />
+      </div>
     </div>
   );
+
+  const renderClassicTemplate = () => (
+    <div className="p-8 rounded-lg border border-gray-300 bg-white shadow">
+      <h1 className="text-3xl font-serif font-bold text-gray-900 mb-4">
+        {name || "Your Name"}
+      </h1>
+      {/* Similar logic as modern, different design */}
+    </div>
+  );
+
+  // Template Rendering Logic
+  const renderTemplate = () => {
+    switch (selectedTemplate) {
+      case "modern":
+        return renderModernTemplate();
+      case "classic":
+        return renderClassicTemplate();
+      default:
+        return renderModernTemplate();
+    }
+  };
+
+  return renderTemplate();
 };
 
 export default PDFViewer;
